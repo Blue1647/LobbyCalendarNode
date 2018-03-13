@@ -3,22 +3,51 @@ socket.on('connection', (data) => {
     console.log("Connected to server")
 })
 socket.on('calendarData', eventsArray => {
-
     //clear previous data
     document.getElementById('calendar-data-table').innerHTML = ""
+    document.getElementById('calendar-data-table-today').innerHTML = ""
+    document.getElementById('calendar-data-table-next').innerHTML = ""
+    //loop through array and enter in new data
     for (let e in eventsArray) {
         const ev = eventsArray[e]
-        const evTitle = ev.description
-        const evDate = ev.start
-        const evEnd = ev.end
-        const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
-        console.log(evTime)
-        const evDateFormatted = moment(evDate).format('MMMM DD')
+        //get date difference between now and event's date
+        const dateDiff = moment().diff(ev.start, 'days', true)
 
+        if (dateDiff < 0 && dateDiff > -1) {
+            insertIntoTodayTable(ev)
+        } else {
+            insertIntoNextTable(ev)
+        }
         //enter in new data
-        document.getElementById('calendar-data-table').innerHTML += "<tr><td>" + evTitle +
-            "</td>" + "<td>" + evDateFormatted +
-            "</td>" + "<td>" + evTime +
-            "</td></tr>"
+        // document.getElementById('calendar-data-table').innerHTML += "<tr><td>" + evTitle +
+        //     "</td>" + "<td>" + evDateFormatted +
+        //     "</td>" + "<td>" + evTime +
+        //     "</td></tr>"
     }
 })
+
+function insertIntoTodayTable(ev) {
+    const evTitle = ev.description
+    const evDate = ev.start
+    const evEnd = ev.end
+    const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
+    const evDateFormatted = moment(evDate).format('MMMM DD')
+    //enter in new data
+    document.getElementById('calendar-data-table-today').innerHTML += "<tr><td>" + evTitle +
+        "</td>" + "<td>" + evDateFormatted +
+        "</td>" + "<td>" + evTime +
+        "</td></tr>"
+}
+
+function insertIntoNextTable(ev) {
+    const evTitle = ev.description
+    const evDate = ev.start
+    const evEnd = ev.end
+    const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
+    const evDateFormatted = moment(evDate).format('MMMM DD')
+    //enter in new data
+    document.getElementById('calendar-data-table-next').innerHTML += "<tr><td>" + evTitle +
+        "</td>" + "<td>" + evDateFormatted +
+        "</td>" + "<td>" + evTime +
+        "</td></tr>"
+}
