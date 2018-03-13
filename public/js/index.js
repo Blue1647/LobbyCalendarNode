@@ -4,7 +4,6 @@ socket.on('connection', (data) => {
 })
 socket.on('calendarData', eventsArray => {
     //clear previous data
-    document.getElementById('calendar-data-table').innerHTML = ""
     document.getElementById('calendar-data-table-today').innerHTML = ""
     document.getElementById('calendar-data-table-next').innerHTML = ""
     //loop through array and enter in new data
@@ -12,17 +11,11 @@ socket.on('calendarData', eventsArray => {
         const ev = eventsArray[e]
         //get date difference between now and event's date
         const dateDiff = moment().diff(ev.start, 'days', true)
-
         if (dateDiff < 0 && dateDiff > -1) {
             insertIntoTodayTable(ev)
         } else {
             insertIntoNextTable(ev)
         }
-        //enter in new data
-        // document.getElementById('calendar-data-table').innerHTML += "<tr><td>" + evTitle +
-        //     "</td>" + "<td>" + evDateFormatted +
-        //     "</td>" + "<td>" + evTime +
-        //     "</td></tr>"
     }
 })
 
@@ -33,7 +26,7 @@ function insertIntoTodayTable(ev) {
     const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
     const evDateFormatted = moment(evDate).format('MMMM DD')
     //enter in new data
-    document.getElementById('calendar-data-table-today').innerHTML += "<tr><td>" + evTitle +
+    document.getElementById('calendar-data-table-today').innerHTML += "<tr class=\"table-info\"><td>" + evTitle +
         "</td>" + "<td>" + evDateFormatted +
         "</td>" + "<td>" + evTime +
         "</td></tr>"
@@ -46,7 +39,7 @@ function insertIntoNextTable(ev) {
     const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
     const evDateFormatted = moment(evDate).format('MMMM DD')
     //enter in new data
-    document.getElementById('calendar-data-table-next').innerHTML += "<tr><td>" + evTitle +
+    document.getElementById('calendar-data-table-next').innerHTML += "<tr class=\"table-success\"><td>" + evTitle +
         "</td>" + "<td>" + evDateFormatted +
         "</td>" + "<td>" + evTime +
         "</td></tr>"

@@ -5,42 +5,42 @@
         crossorigin="anonymous">
 
 </head>
-<h1>Calendar</h1>
 
 <body>
-    <div id="calendar container">
-        <table class="table table-striped table-hover">
-            <tr>
-                <th>Title</th>
-                <th>Date</th>
-                <th>Time</th>
-            </tr>
-            <tbody id="calendar-data-table">
+    <div id="container">
 
-            </tbody>
-        </table>
-        <h1>Today</h1>
-        <table class="table table-striped table-hover">
-            <tr>
-                <th>Title</th>
-                <th>Date</th>
-                <th>Time</th>
-            </tr>
-            <tbody id="calendar-data-table-today">
+        <h1>Calendar</h1>
+        <!--Curr time-->
+        <h1 class="text-center" id="date"></h1>
+        <h1 class="text-center" id="time"></h1>
+        <div class="pagination-centered">
+            <p id="text">
+                <h1 class="text-center">Welcome to </h1>
+                <img src="img/logo.png" width="100%" id="logo" />
+                <p id="text">
+                    <h1 class="text-center">Today</h1>
+                    <table class="table table-striped table-hover">
+                        <tr>
+                            <th>Title</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                        <tbody id="calendar-data-table-today">
 
-            </tbody>
-        </table>
-        <h1>Up Next</h1>
-        <table class="table table-striped table-hover">
-            <tr>
-                <th>Title</th>
-                <th>Date</th>
-                <th>Time</th>
-            </tr>
-            <tbody id="calendar-data-table-next">
+                        </tbody>
+                    </table>
+                    <h1 class="text-center">Up Next</h1>
+                    <table class="table table-striped table-hover">
+                        <tr>
+                            <th>Title</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                        <tbody id="calendar-data-table-next">
 
-            </tbody>
-        </table>
+                        </tbody>
+                    </table>
+        </div>
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
@@ -49,6 +49,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
     crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
 
 </html>
