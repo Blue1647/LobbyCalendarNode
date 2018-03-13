@@ -10,11 +10,15 @@ socket.on('calendarData', eventsArray => {
         const ev = eventsArray[e]
         const evTitle = ev.description
         const evDate = ev.start
-        const evDateFormatted = moment(evDate).format("MMMM MM, YYYY")
+        const evEnd = ev.end
+        const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
+        console.log(evTime)
+        const evDateFormatted = moment(evDate).format('MMMM DD')
 
         //enter in new data
         document.getElementById('calendar-data-table').innerHTML += "<tr><td>" + evTitle +
-            " </td><td>" + evDateFormatted +
+            "</td>" + "<td>" + evDateFormatted +
+            "</td>" + "<td>" + evTime +
             "</td></tr>"
     }
 })
