@@ -20,7 +20,7 @@ downloadiCalData()
 downloadGoogleCalData()
 
 //get calendar events from ical file
-async function downloadiCalData() {
+function downloadiCalData() {
     const currDate = moment()
     ical.fromURL(iCalUrl, {}, (err, data) => {
         if (err) throw err
@@ -55,11 +55,18 @@ function downloadGoogleCalData() {
         json: true
     }, (err, res, body) => {
         if (err) throw err
+        //reduce the amount of google cal events
         let sliced = body.items.slice(0, 5)
         for (let k in sliced) {
-            events.push(sliced[k])
+            //parse through event objects and insert into the events array and filter out events more than a day old; this should never happen, google always returns fresh data
+            // if (moment().diff(sliced[k].start.dateTime, 'days', true)) {
+            //     //move on to the next item in array
+            //     continue
+            // } else {
+            //     events.push(normalizeEventObj(sliced[k]))
+            // }
+            events.push(normalizeEventObj(sliced[k]))
         }
-        console.log(events);
     })
 }
 
@@ -70,7 +77,7 @@ app.get('/', (req, res) => {
 })
 
 
-
+//detect socket connection
 io.on('connection', (socket) => {
     console.log('Client connected to server...')
     socket.emit('connection', {
@@ -83,4 +90,13 @@ io.on('connection', (socket) => {
 
 function sendCalData(eventsArray) {
     io.emit('calendarData', eventsArray)
+}
+
+//google calendar's JSON response is a little different than the ical response from up top, so recreating all the JSON objects to match
+function normalizeEventObj(event) {
+    let eventObj = {}
+    eventObj.description = event.summary
+    eventObj.start = event.start.dateTime
+    eventObj.end = event.end.dateTime
+    return eventObj
 }

@@ -44,3 +44,15 @@ function insertIntoNextTable(ev) {
         "</td>" + "<td>" + evTime +
         "</td></tr>"
 }
+function runFunction() {
+    var date = moment().format("dddd, MMMM d, YYYY");
+    var time = moment().format("hh:mm A");
+    var dateField = document.getElementById('date');
+    var timeField = document.getElementById('time');
+    dateField.innerHTML = date;
+    timeField.innerHTML = time;
+};
+
+window.addEventListener('load', () => {
+    runFunction();    
+});
