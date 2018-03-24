@@ -1,8 +1,7 @@
 .calendar-tables {
     margin: 0 5em 0 5em;
 }
-
 #logo {
-    margin-top: -15em;
-    margin-bottom: -10em;
+    display: block;
+    margin: 2em auto 2em auto;
 }

@@ -58,13 +58,6 @@ function downloadGoogleCalData() {
         //reduce the amount of google cal events
         let sliced = body.items.slice(0, 5)
         for (let k in sliced) {
-            //parse through event objects and insert into the events array and filter out events more than a day old; this should never happen, google always returns fresh data
-            // if (moment().diff(sliced[k].start.dateTime, 'days', true)) {
-            //     //move on to the next item in array
-            //     continue
-            // } else {
-            //     events.push(normalizeEventObj(sliced[k]))
-            // }
             events.push(normalizeEventObj(sliced[k]))
         }
     })
