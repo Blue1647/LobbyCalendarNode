@@ -9,11 +9,12 @@ socket.on('calendarData', eventsArray => {
     //loop through array and enter in new data
     for (let e in eventsArray) {
         const ev = eventsArray[e]
-        //get date difference between now and event's date
-        const dateDiff = moment().diff(ev.start, 'days', true)
-        if (dateDiff < 0 && dateDiff > -1) {
+        const todayDateDay = new Date().getDate()
+        const eventDateDay = new Date(ev.start).getDate()
+        if (todayDateDay == eventDateDay) { //dateDiff is between 2 and -2 if event is today
             insertIntoTodayTable(ev)
-        } else {
+        } 
+        else {
             insertIntoNextTable(ev)
         }
     }
@@ -44,15 +45,17 @@ function insertIntoNextTable(ev) {
         "</td>" + "<td>" + evTime +
         "</td></tr>"
 }
-function runFunction() {
-    var date = moment().format("dddd, MMMM d, YYYY");
-    var time = moment().format("hh:mm A");
-    var dateField = document.getElementById('date');
-    var timeField = document.getElementById('time');
-    dateField.innerHTML = date;
-    timeField.innerHTML = time;
+
+function clock() {
+    var date = moment().format("dddd, MMMM d, YYYY")
+    var time = moment().format("hh:mm A")
+    var dateField = document.getElementById('date')
+    var timeField = document.getElementById('time')
+    dateField.innerHTML = date
+    timeField.innerHTML = time
 };
 
 window.addEventListener('load', () => {
-    runFunction();    
+    clock()
+    setInterval(clock, 1000)
 });
