@@ -93,3 +93,12 @@ function normalizeEventObj(event) {
     eventObj.end = event.end.dateTime
     return eventObj
 }
+
+function getEvents() {
+    //clear events array
+    events.size = 0
+
+    //download calendar data
+    downloadiCalData()
+    downloadGoogleCalData()
+}

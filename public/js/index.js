@@ -6,14 +6,20 @@ socket.on('calendarData', eventsArray => {
     //clear previous data
     document.getElementById('calendar-data-table-today').innerHTML = ""
     document.getElementById('calendar-data-table-next').innerHTML = ""
+    
+    //sort the events array by date (earliest to latest event)
+    eventsArray.sort((date1, date2) => {
+        return new Date(date1.start) - new Date(date2.start)
+    });
+
     //loop through array and enter in new data
     for (let e in eventsArray) {
         const ev = eventsArray[e]
         const todayDateDay = new Date().getDate()
         const eventDateDay = new Date(ev.start).getDate()
-        if (todayDateDay == eventDateDay) { //dateDiff is between 2 and -2 if event is today
+        if (todayDateDay == eventDateDay) {
             insertIntoTodayTable(ev)
-        } 
+        }
         else {
             insertIntoNextTable(ev)
         }
