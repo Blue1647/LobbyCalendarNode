@@ -53,8 +53,8 @@ function insertIntoNextTable(ev) {
 }
 
 function clock() {
-    var date = moment().format("dddd, MMMM d, YYYY")
-    var time = moment().format("hh:mm A")
+    var date = moment().format('dddd, MMMM DD, YYYY')
+    var time = moment().format('hh:mm A')
     var dateField = document.getElementById('date')
     var timeField = document.getElementById('time')
     dateField.innerHTML = date
