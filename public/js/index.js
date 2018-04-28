@@ -12,6 +12,7 @@ socket.on('calendarData', eventsArray => {
         return new Date(date1.start) - new Date(date2.start)
     });
 
+    let todayEvents = 0
     //loop through array and enter in new data
     for (let e in eventsArray) {
         const ev = eventsArray[e]
@@ -19,10 +20,15 @@ socket.on('calendarData', eventsArray => {
         const eventDateDay = new Date(ev.start).getDate()
         if (todayDateDay == eventDateDay) {
             insertIntoTodayTable(ev)
+            todayEvents++
         }
         else {
             insertIntoNextTable(ev)
         }
+    }
+    //hide the today table if there aren't any events today
+    if (todayEvents == 0) {
+        document.querySelector('.today').style.display= 'none'
     }
 })
 
