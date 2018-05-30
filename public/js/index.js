@@ -33,7 +33,7 @@ socket.on('calendarData', eventsArray => {
 })
 
 function insertIntoTodayTable(ev) {
-    const evTitle = ev.description || ev.summary
+    const evTitle = ev.title || ev.summary
     const evDate = ev.start
     const evEnd = ev.end
     const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
@@ -46,7 +46,7 @@ function insertIntoTodayTable(ev) {
 }
 
 function insertIntoNextTable(ev) {
-    const evTitle = ev.description || ev.summary
+    const evTitle = ev.title || ev.summary
     const evDate = ev.start
     const evEnd = ev.end
     const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
