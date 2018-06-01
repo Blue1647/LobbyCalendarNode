@@ -222,7 +222,7 @@ function getGoogleCalDataAsync(url) {
             }
             for(let i = googleCalEventsArr.length - 1; i >= 0; i--) {
                 googleCalEventsArr.splice(indexesToRemove[i], 1)
-            }
+            } 
             return resolve(googleCalEventsArr)
         })
     })
