@@ -21,6 +21,9 @@ let icalEvents = 0,
     icalDataUpdatedAt, googleCalDataUpdatedAt
 let events = []
 
+
+
+
 // getEvents()
 // //get calendar events every 5 mins
 // setInterval(getEvents, FIVE_MINS)
@@ -125,13 +128,14 @@ function sendCalData(eventsArray) {
     io.emit('calendarData', eventsArray)
 }
 
-//google calendar's JSON response is a little different than the ical response from up top, so recreating all the JSON objects to match
-function normalizeEventObj(event) {
+//gcal's JSON response is a little different than the ical response from up top, so recreating all the JSON objects to match
+function normalizeEventObj(event, dupe) {
     let eventObj = {}
     eventObj.title = event.summary
     eventObj.start = event.start.dateTime
     eventObj.end = event.end.dateTime
     eventObj.source = "google"
+    eventObj.dupe = dupe || false
     return eventObj
 }
 
@@ -148,19 +152,19 @@ function removeDupes(events) {
 }
 
 function dblProm() {
-    const promises = [getiCalFromUrlAsync(iCalUrl), getGoogleCalDataAsync(googleCalUrl)]
-
-    /* Promise.all(promises)
-        .then(data => {
-            console.log(data.length)
-            events = data.slice()
-            console.log(events.length);
-            
-        }) */
     getiCalFromUrlAsync(iCalUrl)
-        .then((data) => {
-            events = data.slice()
+        .then(data => {
+            for (k in data) {
+                events.push(data[k])
+            }
+            getGoogleCalDataAsync(googleCalUrl)
+                .then(data => {
+                    for (k in data) {
+                        events.push(data[k])
+                    }
+                })
         })
+
 }
 
 function getiCalFromUrlAsync(url) {
@@ -199,27 +203,27 @@ function getGoogleCalDataAsync(url) {
             url: url,
             json: true
         }, (err, res, body) => {
+            let googleCalEventsArr = [], indexesToRemove = [], gCalev = []
             if (err) return reject(err)
             //reduce the amount of google cal events
             let sliced = body.items.slice(0, 5)
             googleCalDataUpdatedAt = new Date().toISOString()
             for (let k in sliced) {
-                for (let e in events) {
-                    console.log(e)
-                }
-                /* for (let e in events) {
-                    console.log(events)
-                    if (normalizeEventObj(sliced[k]).title === events[e].title) {
-                        //if the event is a duplicate, don't add it to the array
-                        console.log('same');
-                        continue
-                    } else if (e <= sliced.length) {
-                        console.log(sliced.length)
+                const event = normalizeEventObj(sliced[k])
+                for(let e in events) {
+                    if (e <= k && event.title === events[e].title) {
+                        indexesToRemove.push(k)
+                        googleCalEventsArr.push(normalizeEventObj(sliced[k], true))
+                        // return resolve(googleCalEventsArr)
                     }
-                } */
+                }
+                googleCalEventsArr.push(event)
+                googleCalEvents++
             }
-            googleCalEvents++
-            return resolve(body)
+            for(let i = googleCalEventsArr.length - 1; i >= 0; i--) {
+                googleCalEventsArr.splice(indexesToRemove[i], 1)
+            }
+            return resolve(googleCalEventsArr)
         })
     })
 }
