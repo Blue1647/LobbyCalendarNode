@@ -203,15 +203,17 @@ function getGoogleCalDataAsync(url) {
             url: url,
             json: true
         }, (err, res, body) => {
-            let googleCalEventsArr = [], indexesToRemove = [], gCalev = []
+            let googleCalEventsArr = [],
+                indexesToRemove = [],
+                gCalev = []
             if (err) return reject(err)
             //reduce the amount of google cal events
             let sliced = body.items.slice(0, 5)
             googleCalDataUpdatedAt = new Date().toISOString()
             for (let k in sliced) {
                 const event = normalizeEventObj(sliced[k])
-                for(let e in events) {
-                    if (e <= k && event.title === events[e].title) {
+                for (let e in events) {
+                    if (e <= k && areCalEvsEqual(event, events[e])) {
                         indexesToRemove.push(k)
                         googleCalEventsArr.push(normalizeEventObj(sliced[k], true))
                         // return resolve(googleCalEventsArr)
@@ -220,10 +222,14 @@ function getGoogleCalDataAsync(url) {
                 googleCalEventsArr.push(event)
                 googleCalEvents++
             }
-            for(let i = googleCalEventsArr.length - 1; i >= 0; i--) {
+            for (let i = googleCalEventsArr.length - 1; i >= 0; i--) {
                 googleCalEventsArr.splice(indexesToRemove[i], 1)
-            } 
+            }
             return resolve(googleCalEventsArr)
         })
     })
+}
+
+function areCalEvsEqual(event1, event2) {
+    return event1.title === event2.title
 }
