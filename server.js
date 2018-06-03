@@ -24,11 +24,10 @@ let events = []
 
 
 
-// getEvents()
-// //get calendar events every 5 mins
-// setInterval(getEvents, FIVE_MINS)
+getEvents()
+//get calendar events every 5 mins
+setInterval(getEvents, FIVE_MINS)
 
-dblProm()
 
 //get calendar events from ical file
 function downloadiCalData() {
@@ -74,16 +73,6 @@ function downloadGoogleCalData() {
         let sliced = body.items.slice(0, 5)
         googleCalDataUpdatedAt = new Date().toISOString()
         for (let k in sliced) {
-            for (let e in events) {
-                console.log(events[e])
-                if (normalizeEventObj(sliced[k]).title === events[e].title) {
-                    //if the event is a duplicate, don't add it to the array
-                    console.log('same');
-                    continue
-                } else if (e <= sliced.length) {
-                    console.log(sliced.length)
-                }
-            }
             googleCalEvents++
         }
     })
@@ -129,27 +118,30 @@ function sendCalData(eventsArray) {
 }
 
 //gcal's JSON response is a little different than the ical response from up top, so recreating all the JSON objects to match
-function normalizeEventObj(event, dupe) {
+function normalizeEventObj(event) {
     let eventObj = {}
     eventObj.title = event.summary
     eventObj.start = event.start.dateTime
     eventObj.end = event.end.dateTime
     eventObj.source = "google"
-    eventObj.dupe = dupe || false
     return eventObj
 }
 
 function getEvents() {
-    //clear events array
-    events.size = 0
     //download calendar data
-    downloadiCalData()
-    downloadGoogleCalData()
+    const promises = [getiCalFromUrlAsync(iCalUrl), getGoogleCalDataAsync(googleCalUrl)]
+    Promise.all(promises)
+        .then(data => {
+            if(data.length !=0) {
+                events.size = 0
+                events = data.slice()
+            }
+        })
+        .catch((e) => {
+            throw "Error while getting calendar data " + e
+        })
 }
 
-function removeDupes(events) {
-    return Array.from(new Set(events))
-}
 
 function dblProm() {
     getiCalFromUrlAsync(iCalUrl)
@@ -217,8 +209,4 @@ function getGoogleCalDataAsync(url) {
             return resolve(googleCalEventsArr)
         })
     })
-}
-
-function areCalEvsEqual(event1, event2) {
-    return event1.title === event2.title
 }
