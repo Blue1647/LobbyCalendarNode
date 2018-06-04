@@ -22,9 +22,6 @@ socket.on('calendarData', eventsArray => {
         return false
     })
     
-
-    
-
     let todayEvents = 0
     //loop through array and enter in new data
     for (let e in dupLess) {

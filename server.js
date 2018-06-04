@@ -29,55 +29,6 @@ getEvents()
 setInterval(getEvents, FIVE_MINS)
 
 
-//get calendar events from ical file
-function downloadiCalData() {
-    const currDate = moment()
-    ical.fromURL(iCalUrl, {}, (err, data) => {
-        if (err) throw err
-        let counter = 0
-        //data returned is an array of events
-        for (let k in data) {
-            const ev = data[k]
-            const evDate = moment(ev.start)
-            icalDataUpdatedAt = new Date().toISOString()
-            if (data.hasOwnProperty(k)) {
-                //parse through event objects and insert into the events array and filter out events more than a day old
-                if (moment().diff(evDate, 'days', true) > 0 || counter >= 15) {
-                    //move on to the next item in array
-                    continue
-                } else {
-                    ev.title = ev.summary
-                    ev.source = "ical"
-                    events.push(ev)
-                    icalEvents++
-                }
-            }
-            counter++
-        }
-        //initially send calendar events to client
-        sendCalData(events)
-    })
-    //send calendar events to client every minute
-    setInterval(() => {
-        sendCalData(events)
-    }, 60000)
-}
-
-function downloadGoogleCalData() {
-    request({
-        url: googleCalUrl,
-        json: true
-    }, (err, res, body) => {
-        if (err) throw err
-        //reduce the amount of google cal events
-        let sliced = body.items.slice(0, 5)
-        googleCalDataUpdatedAt = new Date().toISOString()
-        for (let k in sliced) {
-            googleCalEvents++
-        }
-    })
-}
-
 //setup express endpoint
 app.get('/', (req, res) => {
     res.render('public/index')
@@ -128,33 +79,25 @@ function normalizeEventObj(event) {
 }
 
 function getEvents() {
-    //download calendar data
-    const promises = [getiCalFromUrlAsync(iCalUrl), getGoogleCalDataAsync(googleCalUrl)]
-    Promise.all(promises)
-        .then(data => {
-            if(data.length !=0) {
-                events.size = 0
-                events = data.slice()
+    //download ical data
+    getiCalFromUrlAsync(iCalUrl)
+        .then((data) => {
+            for(d in data) {
+                events.push(data[d])
             }
         })
         .catch((e) => {
-            throw "Error while getting calendar data " + e
+            throw "Error while getting ical data " + e
         })
-}
-
-
-function dblProm() {
-    getiCalFromUrlAsync(iCalUrl)
-        .then(data => {
-            for (k in data) {
-                events.push(data[k])
+    //download google cal data
+    getGoogleCalDataAsync(googleCalUrl)
+        .then((data) => {
+            for(d in data) {
+                events.push(data[d])
             }
-            getGoogleCalDataAsync(googleCalUrl)
-                .then(data => {
-                    for (k in data) {
-                        events.push(data[k])
-                    }
-                })
+        })
+        .catch((e) => {
+            throw "Error while getting google calendar data " + e
         })
 
 }
