@@ -1,6 +1,3 @@
-.calendar-tables {
-    margin: 0 5em 0 5em;
-}
 .today {
     display: none;
 }
@@ -10,4 +7,7 @@
 #logo {
     display: block;
     margin: 2em auto 2em auto;
+}
+.calendar-tables td {
+    font-size:2em;
 }
