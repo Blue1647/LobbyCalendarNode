@@ -23,7 +23,7 @@ let events = []
 
 
 
-
+//initially get calendar events
 getEvents()
 //get calendar events every 5 mins
 setInterval(getEvents, FIVE_MINS)
@@ -152,4 +152,9 @@ function getGoogleCalDataAsync(url) {
             return resolve(googleCalEventsArr)
         })
     })
+}
+
+function sendRefreshSignalToClient() {
+    console.log('sending refresh')
+    io.emit('refresh', 'refreshSignal')
 }

@@ -96,3 +96,8 @@ window.addEventListener('load', () => {
     clock()
     setInterval(clock, 1000)
 })
+
+socket.on('refresh', () => {
+    window.location.reload()
+    console.log('got reload signal')
+})
