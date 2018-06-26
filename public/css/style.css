@@ -11,6 +11,18 @@
 .calendar-tables td {
     font-size:2em;
 }
+.calendar-tables th {
+    font-size: 1.5em;
+}
 .header-text {
     font-size:5em;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 2em;
+    width: 100%;
+    font-size: 1.8em;
+    text-align: center;
 }
