@@ -7,6 +7,9 @@ socket.on('calendarData', eventsArray => {
     document.getElementById('calendar-data-table-today').innerHTML = ""
     document.getElementById('calendar-data-table-next').innerHTML = ""
 
+    //total number of events to show on the table
+    const numOfEvs = 4
+
     //sort the events array by date (earliest to latest event)
     eventsArray.sort((date1, date2) => {
         return new Date(date1.start) - new Date(date2.start)
@@ -15,7 +18,7 @@ socket.on('calendarData', eventsArray => {
     //remove dupulicate events from array
     let dups = []
     let dupLess = eventsArray.filter((e) => {
-        if(dups.indexOf(e.title) == -1) {
+        if (dups.indexOf(e.title) == -1) {
             dups.push(e.title)
             return true
         }
@@ -30,12 +33,18 @@ socket.on('calendarData', eventsArray => {
         const todayDateMonth = new Date().getMonth()
         const eventDateDay = new Date(ev.start).getDate()
         const eventDateMonth = new Date(ev.start).getMonth()
-        if ((todayDateDay == eventDateDay) && (todayDateMonth == eventDateMonth)) {
-            showTodayTable()
-            insertIntoTodayTable(ev)
-            todayEvents++
-        } else {
-            insertIntoNextTable(ev)
+        if (e < numOfEvs) {
+            if ((todayDateDay == eventDateDay) && (todayDateMonth == eventDateMonth)) {
+                showTodayTable()
+                insertIntoTodayTable(ev)
+                todayEvents++
+            } else {
+                insertIntoNextTable(ev)
+            }
+        }
+        //skip putting the event into the table if it has reached the max number of events
+        else {
+            return
         }
     }
     //hide the today table if there aren't any events today
@@ -82,12 +91,15 @@ function clock() {
 function showTodayTable() {
     document.querySelector('.today').style.display = 'inline'
 }
+
 function showUpNextTable() {
     document.querySelector('.up-next').style.display = 'block'
 }
+
 function hideTodayTable() {
     document.querySelector('.today').style.display = 'none'
 }
+
 function hideUpNextTable() {
     document.querySelector('.up-next').style.display = 'none'
 }
