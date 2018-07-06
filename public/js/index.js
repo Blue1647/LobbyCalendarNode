@@ -8,7 +8,7 @@ socket.on('calendarData', eventsArray => {
     document.getElementById('calendar-data-table-next').innerHTML = ""
 
     //total number of events to show on the table
-    const numOfEvs = 4
+    const numOfEvs = 5
 
     //sort the events array by date (earliest to latest event)
     eventsArray.sort((date1, date2) => {
