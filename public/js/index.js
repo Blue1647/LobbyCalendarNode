@@ -38,7 +38,12 @@ socket.on('calendarData', eventsArray => {
                 showTodayTable()
                 insertIntoTodayTable(ev)
                 todayEvents++
-            } else {
+            }
+            //if date is in the past, skip it
+            else if ((todayDateMonth == eventDateMonth) && (eventDateDay < todayDateDay)) {
+                continue
+            }
+            else {
                 insertIntoNextTable(ev)
             }
         }
