@@ -79,6 +79,8 @@ function normalizeEventObj(event) {
 }
 
 function getEvents() {
+    //clear current array 
+    events.size = 0
     //download ical data
     getiCalFromUrlAsync(iCalUrl)
         .then((data) => {
