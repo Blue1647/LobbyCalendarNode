@@ -92,7 +92,7 @@ function getEvents() {
             throw "Error while getting ical data " + e
         })
     //download google cal data
-    getGoogleCalDataAsync(googleCalUrl)
+    /* getGoogleCalDataAsync(googleCalUrl)
         .then((data) => {
             for(d in data) {
                 events.push(data[d])
@@ -100,7 +100,7 @@ function getEvents() {
         })
         .catch((e) => {
             throw "Error while getting google calendar data " + e
-        })
+        }) */
 
 }
 

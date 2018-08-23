@@ -63,7 +63,7 @@ function insertIntoTodayTable(ev) {
     const evDate = ev.start
     const evEnd = ev.end
     const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
-    const evDateFormatted = moment(evDate).format('ddd, MMMM DD')
+    const evDateFormatted = moment(evDate).format('ddd, MMM DD')
     //enter in new data
     document.getElementById('calendar-data-table-today').innerHTML += "<tr class=\"table-info\"><td>" + evTitle +
         "</td>" + "<td>" + evDateFormatted +
@@ -76,7 +76,7 @@ function insertIntoNextTable(ev) {
     const evDate = ev.start
     const evEnd = ev.end
     const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
-    const evDateFormatted = moment(evDate).format('ddd, MMMM DD')
+    const evDateFormatted = moment(evDate).format('ddd, MMM DD')
     //enter in new data
     document.getElementById('calendar-data-table-next').innerHTML += "<tr class=\"table-success\"><td>" + evTitle +
         "</td>" + "<td>" + evDateFormatted +
