@@ -32,6 +32,7 @@ setInterval(getEvents, FIVE_MINS)
 //setup express endpoint
 app.get('/', (req, res) => {
     res.render('public/index')
+    sendCalData(events)
     res.end()
 })
 
@@ -59,13 +60,13 @@ io.on('connection', (socket) => {
     socket.emit('connection', {
         'connected': true
     })
-    if (events.length != 0) {
-        sendCalData(events)
-    }
+    sendCalData(events)
 })
 
 function sendCalData(eventsArray) {
-    io.emit('calendarData', eventsArray)
+    if (events.length != 0) {
+        io.emit('calendarData', eventsArray)
+    }
 }
 
 //gcal's JSON response is a little different than the ical response from up top, so recreating all the JSON objects to match
@@ -84,24 +85,14 @@ function getEvents() {
     //download ical data
     getiCalFromUrlAsync(iCalUrl)
         .then((data) => {
-            for(d in data) {
+            for (d in data) {
                 events.push(data[d])
             }
+            sendCalData(events)
         })
         .catch((e) => {
             throw "Error while getting ical data " + e
         })
-    //download google cal data
-    /* getGoogleCalDataAsync(googleCalUrl)
-        .then((data) => {
-            for(d in data) {
-                events.push(data[d])
-            }
-        })
-        .catch((e) => {
-            throw "Error while getting google calendar data " + e
-        }) */
-
 }
 
 function getiCalFromUrlAsync(url) {
@@ -132,31 +123,4 @@ function getiCalFromUrlAsync(url) {
             return resolve(icalEventsArr)
         })
     })
-}
-
-function getGoogleCalDataAsync(url) {
-    return new Promise((resolve, reject) => {
-        request({
-            url: url,
-            json: true
-        }, (err, res, body) => {
-            let googleCalEventsArr = [],
-                gCalev = []
-            if (err) return reject(err)
-            //reduce the amount of google cal events
-            let sliced = body.items.slice(0, 5)
-            googleCalDataUpdatedAt = new Date().toISOString()
-            for (let k in sliced) {
-                const event = normalizeEventObj(sliced[k])
-                googleCalEventsArr.push(event)
-                googleCalEvents++
-            }
-            return resolve(googleCalEventsArr)
-        })
-    })
-}
-
-function sendRefreshSignalToClient() {
-    console.log('sending refresh')
-    io.emit('refresh', 'refreshSignal')
 }
