@@ -8,6 +8,7 @@ const io = require('socket.io').listen(server)
 const request = require('request')
 const ical = require('ical')
 const moment = require('moment')
+const businessHours = require('./businessHours.json')
 
 
 app.use(express.static(__dirname + "/public"))
@@ -15,7 +16,6 @@ app.use(express.static(__dirname + "/public"))
 //five mins in ms
 const FIVE_MINS = 300000
 const iCalUrl = "http://bluelacuna.spaces.nexudus.com/en/feeds/events"
-const googleCalUrl = "https://www.googleapis.com/calendar/v3/calendars/oifj0r6ik0s58t7vm457irf0lk@group.calendar.google.com/events?key=AIzaSyCG4-gSYXFsIp_R7p1e7yuzQ64xgTKwhcU&singleEvents=true&orderBy=startTime&maxResults=20&timeMin=" + new Date().toJSON()
 let icalEvents = 0,
     googleCalEvents = 0,
     icalDataUpdatedAt, googleCalDataUpdatedAt
@@ -31,11 +31,15 @@ setInterval(getEvents, FIVE_MINS)
 
 //setup express endpoint
 app.get('/', (req, res) => {
-    res.render('public/index')
+    res.render('public/index', {isOpen: isOpen()})
     sendCalData(events)
     res.end()
 })
-
+//business hours endpoint
+app.get('/hours', (req, res) => {
+    res.json(businessHours)
+    res.end()
+})
 //ical api endpoint
 app.get('/events', (req, res) => {
     if (events.length != 0) {
@@ -60,6 +64,7 @@ io.on('connection', (socket) => {
     socket.emit('connection', {
         'connected': true
     })
+    io.emit('open', isOpen())
     sendCalData(events)
 })
 
@@ -68,15 +73,33 @@ function sendCalData(eventsArray) {
         io.emit('calendarData', eventsArray)
     }
 }
-
-//gcal's JSON response is a little different than the ical response from up top, so recreating all the JSON objects to match
-function normalizeEventObj(event) {
-    let eventObj = {}
-    eventObj.title = event.summary
-    eventObj.start = event.start.dateTime
-    eventObj.end = event.end.dateTime
-    eventObj.source = "google"
-    return eventObj
+//are we open for business?
+function isOpen() {
+    let now = moment('2018-12-02T23:56:05+0000')
+    console.log(now.format('ddd'))
+    let day = now.format('dddd').toLocaleLowerCase()
+    let open, close
+    switch (day) {
+        case 'monday':
+        case 'tuesday':
+        case 'wednesday':
+        case 'thursday':
+        case 'friday':
+            open = moment(businessHours.open.weekday.from, ['hh:m a'])
+            close = moment(businessHours.open.weekday.to, ['hh:m a'])
+        case 'saturday':
+            open = moment(businessHours.open.saturday.from, ['hh:m a'])
+            close = moment(businessHours.open.saturday.to, ['hh:m a'])
+            break
+        default:
+            return false
+    }
+    if (now.isBetween(open,close) || now.isSame(open)) {
+        return true
+    }
+    else {
+        return false
+    }
 }
 
 function getEvents() {

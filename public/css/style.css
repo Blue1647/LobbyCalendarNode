@@ -26,3 +26,7 @@
     font-size: 1.8em;
     text-align: center;
 }
+/* Hide the closed section by default */
+.closed {
+    display: none;
+}

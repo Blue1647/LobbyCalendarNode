@@ -14,7 +14,11 @@
         <h1 class="text-center header-text" id="date"></h1>
         <h1 class="text-center header-text" id="time"></h1>
         <div>
-            <h1 class="text-center header-text">Welcome to </h1>
+            <h1 class="text-center header-text open">Welcome to</h1>
+            <div class="closed">
+                <h1 class="text-center header-text">Sorry, we're closed.</h1>
+                <h3 class="text-center">Our business hours are Mon-Fri: 9AM-9PM | Sat:10AM-5PM</h3>
+            </div>
             <img src="img/logo.png" class="center-block" id="logo" />
             <div class="calendar-tables">
                 <div class="today">
@@ -54,6 +58,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="js/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.js"></script>
+<script src="js/moment-holiday-us.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
     crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"

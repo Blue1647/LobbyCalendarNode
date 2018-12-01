@@ -57,6 +57,18 @@ socket.on('calendarData', eventsArray => {
         hideTodayTable()
     }
 })
+socket.on('open', isOpen => {
+    console.log(isOpen)
+    if(isOpen) {
+        document.querySelector('.closed').style.display = 'none'
+        document.querySelector('.open').style.display = 'inline'
+    }
+    else {
+        document.querySelector('.closed').style.display = 'block'
+        document.querySelector('.open').style.display = 'none'
+    }
+})
+
 
 function insertIntoTodayTable(ev) {
     const evTitle = ev.title || ev.summary

@@ -1,0 +1,18 @@
+{
+	"open": {
+		"weekday": {
+			"from": "09:00 AM",
+			"to": "09:00 PM"
+		},
+		"saturday": {
+			"from": "10:00 AM",
+			"to": "05:00 PM"
+		}
+	},
+	"closed": [
+		"turkey",
+		"christ",
+		"eve",
+		"year"
+	]
+}
