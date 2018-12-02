@@ -32,7 +32,7 @@ setInterval(getEvents, FIVE_MINS)
 //setup express endpoint
 app.get('/', (req, res) => {
     res.render('public/index', {isOpen: isOpen()})
-    sendCalData(events)
+    sendData(events)
     res.end()
 })
 //business hours endpoint
@@ -64,18 +64,18 @@ io.on('connection', (socket) => {
     socket.emit('connection', {
         'connected': true
     })
-    io.emit('open', isOpen())
-    sendCalData(events)
+    sendData(events)
 })
 
-function sendCalData(eventsArray) {
+function sendData(eventsArray) {
+    io.emit('open', isOpen())
     if (events.length != 0) {
         io.emit('calendarData', eventsArray)
     }
 }
 //are we open for business?
 function isOpen() {
-    let now = moment('2018-12-02T23:56:05+0000')
+    let now = moment()
     console.log(now.format('ddd'))
     let day = now.format('dddd').toLocaleLowerCase()
     let open, close
@@ -111,7 +111,7 @@ function getEvents() {
             for (d in data) {
                 events.push(data[d])
             }
-            sendCalData(events)
+            sendData(events)
         })
         .catch((e) => {
             throw "Error while getting ical data " + e
