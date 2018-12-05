@@ -76,7 +76,6 @@ function sendData(eventsArray) {
 //are we open for business?
 function isOpen() {
     let now = moment()
-    console.log(now.format('ddd'))
     let day = now.format('dddd').toLocaleLowerCase()
     let open, close
     switch (day) {

@@ -61,7 +61,7 @@ socket.on('open', isOpen => {
     console.log(isOpen)
     if(isOpen) {
         document.querySelector('.closed').style.display = 'none'
-        document.querySelector('.open').style.display = 'inline'
+        document.querySelector('.open').style.display = 'block'
     }
     else {
         document.querySelector('.closed').style.display = 'block'
