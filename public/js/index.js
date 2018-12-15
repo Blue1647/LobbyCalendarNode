@@ -1,7 +1,10 @@
 const socket = io.connect()
-socket.on('connection', (data) => {
+socket.on('connection', () => {
     console.log("Connected to server")
 })
+const ONE_MIN = 60000
+getBusinessHours()
+setInterval(getBusinessHours, ONE_MIN)
 socket.on('calendarData', eventsArray => {
     //clear previous data
     document.getElementById('calendar-data-table-today').innerHTML = ""
@@ -57,19 +60,46 @@ socket.on('calendarData', eventsArray => {
         hideTodayTable()
     }
 })
-socket.on('open', isOpen => {
-    console.log(isOpen)
-    if(isOpen) {
+
+
+//get the businessHours json
+function getBusinessHours() {
+    $.getJSON("/hours", function(json) {
+        isOpen(json)
+    })
+}
+
+//are we open for business?
+function isOpen(businessHours) {
+    let now = moment()
+    let day = now.format('dddd').toLocaleLowerCase()
+    let open, close
+    switch (day) {
+        case 'monday':
+        case 'tuesday':
+        case 'wednesday':
+        case 'thursday':
+        case 'friday':
+            open = moment(businessHours.open.weekday.from, ['hh:m a'])
+            close = moment(businessHours.open.weekday.to, ['hh:m a'])
+        case 'saturday':
+            open = moment(businessHours.open.saturday.from, ['hh:m a'])
+            close = moment(businessHours.open.saturday.to, ['hh:m a'])
+            break
+        default:
+            return false
+    }
+    //if we're open
+    if (now.isBetween(open,close) || now.isSame(open)) {
         document.querySelector('.closed').style.display = 'none'
         document.querySelector('.open').style.display = 'block'
     }
+    // if we're closed
     else {
         document.querySelector('.closed').style.display = 'block'
         document.querySelector('.open').style.display = 'none'
     }
-})
-
-
+}
 function insertIntoTodayTable(ev) {
     const evTitle = ev.title || ev.summary
     const evDate = ev.start

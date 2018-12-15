@@ -31,7 +31,7 @@ setInterval(getEvents, FIVE_MINS)
 
 //setup express endpoint
 app.get('/', (req, res) => {
-    res.render('public/index', {isOpen: isOpen()})
+    res.render('public/index')
     sendData(events)
     res.end()
 })
@@ -68,7 +68,6 @@ io.on('connection', (socket) => {
 })
 
 function sendData(eventsArray) {
-    io.emit('open', isOpen())
     if (events.length != 0) {
         io.emit('calendarData', eventsArray)
     }
