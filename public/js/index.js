@@ -2,9 +2,8 @@ const socket = io.connect()
 socket.on('connection', () => {
     console.log("Connected to server")
 })
-const ONE_MIN = 60000
 getBusinessHours()
-setInterval(getBusinessHours, ONE_MIN)
+setInterval(getBusinessHours, 1000)
 socket.on('calendarData', eventsArray => {
     //clear previous data
     document.getElementById('calendar-data-table-today').innerHTML = ""
