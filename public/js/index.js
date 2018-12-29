@@ -2,8 +2,13 @@ const socket = io.connect()
 socket.on('connection', () => {
     console.log("Connected to server")
 })
+let businessHours;
 getBusinessHours()
-setInterval(getBusinessHours, 1000)
+setInterval(() => {
+    if (businessHours) {
+        isOpen(businessHours)
+    }
+}, 1000)
 socket.on('calendarData', eventsArray => {
     //clear previous data
     document.getElementById('calendar-data-table-today').innerHTML = ""
@@ -64,7 +69,7 @@ socket.on('calendarData', eventsArray => {
 //get the businessHours json
 function getBusinessHours() {
     $.getJSON("/hours", function(json) {
-        isOpen(json)
+        businessHours = json
     })
 }
 
