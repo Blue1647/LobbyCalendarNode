@@ -129,7 +129,7 @@ function getiCalFromUrlAsync(url) {
                 icalDataUpdatedAt = new Date().toISOString()
                 if (data.hasOwnProperty(k)) {
                     //parse through event objects and insert into the events array and filter out events more than a day old
-                    if (moment().diff(evDate, 'days', true) > 0 || counter >= 15) {
+                    if (moment().diff(evDate, 'days', true) > 1 || counter >= 15) {
                         //move on to the next item in array
                         continue
                     } else {
@@ -138,6 +138,7 @@ function getiCalFromUrlAsync(url) {
                         icalEventsArr.push(ev)
                         icalEvents++
                     }
+
                 }
                 counter++
             }
