@@ -2,13 +2,7 @@ const socket = io.connect()
 socket.on('connection', () => {
     console.log("Connected to server")
 })
-let businessHours;
-getBusinessHours()
-setInterval(() => {
-    if (businessHours) {
-        isOpen(businessHours)
-    }
-}, 1000)
+
 socket.on('calendarData', eventsArray => {
     //clear previous data
     document.getElementById('calendar-data-table-today').innerHTML = ""
@@ -19,28 +13,20 @@ socket.on('calendarData', eventsArray => {
 
     //sort the events array by date (earliest to latest event)
     eventsArray.sort((date1, date2) => {
-        return new Date(date1.start) - new Date(date2.start)
-    })
-
-    //remove dupulicate events from array
-    let dups = []
-    let dupLess = eventsArray.filter((e) => {
-        if (dups.indexOf(e.title) == -1) {
-            dups.push(e.title)
-            return true
-        }
-        return false
+        return new Date(date1.StartDate) - new Date(date2.StartDate)
     })
     showUpNextTable()
     let todayEvents = 0
     //loop through array and enter in new data
-    for (let e in dupLess) {
-        const ev = dupLess[e]
+    for (let e in eventsArray) {
+        const ev = eventsArray[e]
+        const localTime = moment(ev.StartDate).local()
         const todayDateDay = new Date().getDate()
         const todayDateMonth = new Date().getMonth()
-        const eventDateDay = new Date(ev.start).getDate()
-        const eventDateMonth = new Date(ev.start).getMonth()
+        const eventDateDay = localTime.date()
+        const eventDateMonth = localTime.month()
         if (e < numOfEvs) {
+            // if date is today, insert into today table
             if ((todayDateDay == eventDateDay) && (todayDateMonth == eventDateMonth)) {
                 showTodayTable()
                 insertIntoTodayTable(ev)
@@ -50,6 +36,7 @@ socket.on('calendarData', eventsArray => {
             else if ((todayDateMonth == eventDateMonth) && (eventDateDay < todayDateDay)) {
                 continue
             }
+            // if date is in the future, insert into up next table
             else {
                 insertIntoNextTable(ev)
             }
@@ -64,50 +51,10 @@ socket.on('calendarData', eventsArray => {
         hideTodayTable()
     }
 })
-
-
-//get the businessHours json
-function getBusinessHours() {
-    $.getJSON("/hours", function(json) {
-        businessHours = json
-    })
-}
-
-//are we open for business?
-function isOpen(businessHours) {
-    let now = moment()
-    let day = now.format('dddd').toLocaleLowerCase()
-    let open, close
-    switch (day) {
-        case 'monday':
-        case 'tuesday':
-        case 'wednesday':
-        case 'thursday':
-        case 'friday':
-            open = moment(businessHours.open.weekday.from, ['hh:m a'])
-            close = moment(businessHours.open.weekday.to, ['hh:m a'])
-        case 'saturday':
-            open = moment(businessHours.open.saturday.from, ['hh:m a'])
-            close = moment(businessHours.open.saturday.to, ['hh:m a'])
-            break
-        default:
-            return false
-    }
-    //if we're open
-    if (now.isBetween(open,close) || now.isSame(open)) {
-        document.querySelector('.closed').style.display = 'none'
-        document.querySelector('.open').style.display = 'block'
-    }
-    // if we're closed
-    else {
-        document.querySelector('.closed').style.display = 'block'
-        document.querySelector('.open').style.display = 'none'
-    }
-}
 function insertIntoTodayTable(ev) {
-    const evTitle = ev.title || ev.summary
-    const evDate = ev.start
-    const evEnd = ev.end
+    const evTitle = ev.Name
+    const evDate = ev.StartDate
+    const evEnd = ev.EndDate
     const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
     const evDateFormatted = moment(evDate).format('ddd, MMM DD')
     //enter in new data
@@ -118,9 +65,9 @@ function insertIntoTodayTable(ev) {
 }
 
 function insertIntoNextTable(ev) {
-    const evTitle = ev.title || ev.summary
-    const evDate = ev.start
-    const evEnd = ev.end
+    const evTitle = ev.Name
+    const evDate = ev.StartDate
+    const evEnd = ev.EndDate
     const evTime = moment(evDate).format('hh:mm A') + " - " + moment(evEnd).format('hh:mm A')
     const evDateFormatted = moment(evDate).format('ddd, MMM DD')
     //enter in new data

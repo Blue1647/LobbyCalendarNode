@@ -11,10 +11,9 @@
   "author": "Rakesh Das",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "express": "^4.16.2",
     "http": "0.0.0",
-    "ical": "^0.5.0",
-    "ical.js": "^1.2.2",
     "moment": "^2.20.1",
     "npm": "^5.10.0",
     "request": "^2.87.0",

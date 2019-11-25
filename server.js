@@ -2,26 +2,41 @@
 
 const express = require('express')
 const app = express()
+const env = require('dotenv').config()
 const port = process.env.port || 8888;
 const server = app.listen(port)
 const io = require('socket.io').listen(server)
 const request = require('request')
-const ical = require('ical')
 const moment = require('moment')
-const businessHours = require('./businessHours.json')
 
 
 app.use(express.static(__dirname + "/public"))
 
 //five mins in ms
 const FIVE_MINS = 300000
-const iCalUrl = "http://bluelacuna.spaces.nexudus.com/en/feeds/events"
-let icalEvents = 0,
-    googleCalEvents = 0,
-    icalDataUpdatedAt, googleCalDataUpdatedAt
+//info for basic auth
+const NEXUDUS_USERNAME = process.env.NEXUDUS_USERNAME
+const NEXUDUS_PASSWORD = process.env.NEXUDUS_PASSWORD
+const now = moment().format("YYYY-M-DD")
+const oneMonth = moment().add(1, 'month').format("YYYY-M-DD")
+
+const nexudusApiRequestOpts = {
+    method: 'GET',
+    url: 'https://spaces.nexudus.com/api/content/calendarevents',
+    'Content-Type': 'application/jsonp',
+    qs: 
+    { 
+        page: '1',
+        size: '50',
+        orderBy: 'StartDate',
+        dir: 'Descending',
+        From_CalendarEvent_StartDate: now,
+        To_CalendarEvent_EndDate: oneMonth,
+        CalendarEvent_Business: '377677363'
+    }
+}
+let calDataUpdatedAt
 let events = []
-
-
 
 //initially get calendar events
 getEvents()
@@ -35,20 +50,14 @@ app.get('/', (req, res) => {
     sendData(events)
     res.end()
 })
-//business hours endpoint
-app.get('/hours', (req, res) => {
-    res.json(businessHours)
-    res.end()
-})
-//ical api endpoint
+
+//cal api endpoint
 app.get('/events', (req, res) => {
     if (events.length != 0) {
         const parentObj = {}
         parentObj.requestedAt = new Date().toISOString()
-        parentObj.icalEvents = icalEvents
-        parentObj.googleCalEvents = googleCalEvents
-        parentObj.icalDataUpdatedAt = icalDataUpdatedAt
-        parentObj.googleCalDataUpdatedAt = googleCalDataUpdatedAt
+        parentObj.calDataUpdatedAt = calDataUpdatedAt
+        parentObj.numberOfEvents = events.length
         parentObj.events = events
         res.json(parentObj)
         res.end()
@@ -72,77 +81,32 @@ function sendData(eventsArray) {
         io.emit('calendarData', eventsArray)
     }
 }
-//are we open for business?
-function isOpen() {
-    let now = moment()
-    let day = now.format('dddd').toLocaleLowerCase()
-    let open, close
-    switch (day) {
-        case 'monday':
-        case 'tuesday':
-        case 'wednesday':
-        case 'thursday':
-        case 'friday':
-            open = moment(businessHours.open.weekday.from, ['hh:m a'])
-            close = moment(businessHours.open.weekday.to, ['hh:m a'])
-        case 'saturday':
-            open = moment(businessHours.open.saturday.from, ['hh:m a'])
-            close = moment(businessHours.open.saturday.to, ['hh:m a'])
-            break
-        default:
-            return false
-    }
-    if (now.isBetween(open,close) || now.isSame(open)) {
-        return true
-    }
-    else {
-        return false
-    }
-}
 
 function getEvents() {
-    //clear current array 
-    events.size = 0
-    //download ical data
-    getiCalFromUrlAsync(iCalUrl)
+    // download cal data
+    getEventsFromNexudusApi()
         .then((data) => {
-            for (d in data) {
-                events.push(data[d])
-            }
-            sendData(events)
+            events.size = 0
+            events = data.Records
         })
         .catch((e) => {
-            throw "Error while getting ical data " + e
+            throw "Error while getting api data " + e
         })
 }
 
-function getiCalFromUrlAsync(url) {
+function getEventsFromNexudusApi() {
     return new Promise((resolve, reject) => {
-        ical.fromURL(url, {}, (err, data) => {
-            if (err) return reject(err)
-            let counter = 0,
-                icalEventsArr = []
-            //data returned is an array of events
-            for (let k in data) {
-                const ev = data[k]
-                const evDate = moment(ev.start)
-                icalDataUpdatedAt = new Date().toISOString()
-                if (data.hasOwnProperty(k)) {
-                    //parse through event objects and insert into the events array and filter out events more than a day old
-                    if (moment().diff(evDate, 'days', true) > 1 || counter >= 15) {
-                        //move on to the next item in array
-                        continue
-                    } else {
-                        ev.title = ev.summary
-                        ev.source = "ical"
-                        icalEventsArr.push(ev)
-                        icalEvents++
-                    }
-
-                }
-                counter++
+        request(`https://${NEXUDUS_USERNAME}:${NEXUDUS_PASSWORD}@spaces.nexudus.com/api/content/calendarevents`, nexudusApiRequestOpts, (err, res, body) => {
+            if (err) {
+                return reject(err)
             }
-            return resolve(icalEventsArr)
+            try {
+                calDataUpdatedAt = new Date().toISOString()
+                return resolve(JSON.parse(body))
+            }
+            catch (e) {
+               return reject(e)
+            }
         })
     })
 }
